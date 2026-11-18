@@ -93,3 +93,51 @@ button.secondary { background: #fff; color: #1f4e79; }
   overflow-x: auto;
 }
 code { background: #eef1f4; padding: 0 0.25rem; border-radius: 3px; }
+code.hash { word-break: break-all; font-size: 0.8rem; }
+
+.verify-box {
+  background: #fff;
+  border: 1px solid #d7dee6;
+  border-radius: 4px;
+  padding: 0.8rem 1rem;
+  margin: 1rem 0;
+}
+.verify-box h3 { margin-top: 0; font-size: 1rem; }
+.verify-status { margin: 0.5rem 0; }
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.55rem;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+.badge.pass { background: #e3f2e5; color: #1e6b2f; border: 1px solid #9ed3a8; }
+.badge.fail { background: #fdecea; color: #a02c22; border: 1px solid #e5a199; }
+.badge.checking { background: #fff8e1; color: #8a6d1a; border: 1px solid #ead27a; }
+.badge.none { background: #eef1f4; color: #555; border: 1px solid #d7dee6; }
+
+table.kv {
+  border-collapse: collapse;
+  margin: 0.8rem 0;
+  background: #fff;
+}
+table.kv th, table.kv td {
+  border: 1px solid #c9d2dc;
+  padding: 0.4rem 0.8rem;
+  text-align: left;
+  font-size: 0.9rem;
+}
+table.kv th { background: #f0f4f8; white-space: nowrap; }
+
+table.difftab {
+  border-collapse: collapse;
+  margin: 0.5rem 0 1rem;
+  background: #fff;
+}
+table.difftab th, table.difftab td {
+  border: 1px solid #c9d2dc;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.9rem;
+}
+table.difftab thead th { background: #e8eef5; }
+.idlist { line-height: 1.9; }

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}逐号核验结果{% endblock %}
+{% block content %}
+<h2>逐号核验结果</h2>
+
+{% if verif_status == "passed" %}
+<p class="verify-status"><span class="badge pass">核验通过</span>
+   原件指纹匹配当前预览，且两侧检验记录逐号一致。可返回预览页确认发布。</p>
+{% else %}
+<p class="verify-status"><span class="badge fail">核验未通过</span>
+   请根据下列明细核对后重新核验；旧的通过结论（如有）已撤销。</p>
+{% endif %}
+
+{% if not applied %}
+<div class="alert">
+  <p><strong>本次结果未生效：</strong>核验期间预览已更换或已有更新的核验，
+     本结论属于迟到结果，未写入系统，不能作为发布依据。</p>
+</div>
+{% endif %}
+
+{% if checked_at %}<p class="meta">核验时间：{{ checked_at }}</p>{% endif %}
+
+<table class="kv">
+  <tr><th>原件文件</th><td>{{ res.original_filename }}</td></tr>
+  <tr><th>台账文件</th><td>{{ res.ledger_filename }}</td></tr>
+  <tr><th>原件指纹匹配当前预览</th>
+      <td>{% if res.fingerprint_match %}<span class="badge pass">匹配</span>{% else %}<span class="badge fail">不匹配</span>{% endif %}</td></tr>
+  <tr><th>原 CSV 指纹（预览留存）</th><td><code class="hash">{{ res.source_sha256 }}</code></td></tr>
+  <tr><th>本次上传原件指纹</th><td><code class="hash">{{ res.original_sha256 }}</code></td></tr>
+  {% if res.n_original is not none %}<tr><th>原件去重后记录数</th><td>{{ res.n_original }}</td></tr>{% endif %}
+  {% if res.n_ledger is not none %}<tr><th>台账去重后记录数</th><td>{{ res.n_ledger }}</td></tr>{% endif %}
+</table>
+
+{% if res.errors_original %}
+<div class="alert">
+  <p><strong>原件 CSV 被拒绝（整份拒绝）：</strong></p>
+  <ul>{% for e in res.errors_original %}<li>{{ e }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+{% if res.errors_ledger %}
+<div class="alert">
+  <p><strong>台账 CSV 被拒绝（整份拒绝）：</strong></p>
+  <ul>{% for e in res.errors_ledger %}<li>{{ e }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<h3>仅原件存在的检验号（{{ res.only_in_original.total }} 个）</h3>
+{% if res.only_in_original.total %}
+<p class="idlist">
+  {% for tid in res.only_in_original.entries %}<code>{{ tid }}</code>{% if not loop.last %}、{% endif %}{% endfor %}
+  {% if res.only_in_original.truncated %}……（仅列前 {{ res.only_in_original.entries|length }} 个）{% endif %}
+</p>
+{% else %}<p class="meta">无</p>{% endif %}
+
+<h3>仅台账存在的检验号（{{ res.only_in_ledger.total }} 个）</h3>
+{% if res.only_in_ledger.total %}
+<p class="idlist">
+  {% for tid in res.only_in_ledger.entries %}<code>{{ tid }}</code>{% if not loop.last %}、{% endif %}{% endfor %}
+  {% if res.only_in_ledger.truncated %}……（仅列前 {{ res.only_in_ledger.entries|length }} 个）{% endif %}
+</p>
+{% else %}<p class="meta">无</p>{% endif %}
+
+<h3>同号字段差异（{{ res.field_diffs.total }} 处）</h3>
+{% if res.field_diffs.total %}
+<table class="difftab">
+  <thead><tr><th>检验号</th><th>字段</th><th>原件</th><th>台账</th></tr></thead>
+  <tbody>
+    {% for d in res.field_diffs.entries %}
+    <tr><td><code>{{ d.test_id }}</code></td><td>{{ d.field }}</td>
+        <td>{{ d.original }}</td><td>{{ d.ledger }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% if res.field_diffs.truncated %}<p class="meta">……仅列前 {{ res.field_diffs.entries|length }} 处</p>{% endif %}
+{% else %}<p class="meta">无</p>{% endif %}
+
+<p class="meta">以上差异明细仅用于本核验页面核对，不会进入发布表。</p>
+<p><a href="/preview">返回预览页</a></p>
+{% endblock %}

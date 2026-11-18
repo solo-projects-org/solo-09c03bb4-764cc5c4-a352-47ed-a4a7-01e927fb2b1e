@@ -7,14 +7,53 @@
 
 {% include "_table.html" %}
 
+<section class="verify-box">
+  <h3>发布前核验：原件 × 登记台账逐号比对</h3>
+  <p class="meta">原 CSV 指纹（SHA-256，生成预览时留存）：<br>
+    <code class="hash">{{ t.source_sha256 }}</code></p>
+
+  {% if verif %}
+  <p class="verify-status">
+    当前核验状态：
+    {% if verif.status == "passed" %}
+      <span class="badge pass">已通过</span>（{{ verif.created_at }}）
+    {% elif verif.status == "failed" %}
+      <span class="badge fail">未通过</span>（{{ verif.created_at }}，
+      <a href="/verify">查看差异明细</a>）
+    {% else %}
+      <span class="badge checking">核验进行中</span>
+    {% endif %}
+  </p>
+  {% else %}
+  <p class="verify-status">当前核验状态：<span class="badge none">尚未核验</span></p>
+  {% endif %}
+
+  <form method="post" action="/verify" enctype="multipart/form-data" class="upload">
+    <label>原件 CSV（须与生成预览时上传的文件完全一致）：
+      <input type="file" name="original_file" accept=".csv,text/csv" required>
+    </label>
+    <label>登记台账 CSV（独立登记，含 检验号,病区,周次,是否阳性）：
+      <input type="file" name="ledger_file" accept=".csv,text/csv" required>
+    </label>
+    <button type="submit">开始逐号核验</button>
+  </form>
+  <p class="meta">两份文件各自按检验号去重（同号内容冲突整份拒绝）；
+     仅一侧存在的检验号与同号字段差异会列在核验页面，不进入发布表。
+     重新核验同版预览时，旧的核验结论立即作废，以最新结果为准。</p>
+</section>
+
 <div class="actions">
+  {% if can_confirm %}
   <form method="post" action="/confirm"
         onsubmit="return confirm('确认发布？发布后将无法替换或修改。');">
     <button type="submit" class="primary">确认发布</button>
   </form>
+  {% else %}
+  <p class="notice">核验通过后方可确认发布。</p>
+  {% endif %}
   <form method="post" action="/discard">
     <button type="submit" class="secondary">放弃本次预览</button>
   </form>
-  <p><a href="/upload">重新上传（替换本预览）</a></p>
+  <p><a href="/upload">重新上传（替换本预览，需重新核验）</a></p>
 </div>
 {% endblock %}

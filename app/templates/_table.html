@@ -32,4 +32,5 @@
 <p class="meta">
   去重后检验记录 {{ t.n_records }} 条；隐藏格 {{ t.n_hidden }} 个（显示为“—”）。
   来源文件：{{ t.source_filename }}
+  {% if t.source_sha256 %}<br>原 CSV 指纹（SHA-256）：<code class="hash">{{ t.source_sha256 }}</code>{% endif %}
 </p>
